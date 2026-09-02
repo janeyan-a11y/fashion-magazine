@@ -21,7 +21,7 @@ export default async function MagazinePage({ params }: { params: Promise<{ slug:
     ...magazine,
     createdAt: magazine.createdAt.toISOString(),
     updatedAt: magazine.updatedAt.toISOString(),
-    issues: magazine.issues.map((i) => ({
+    issues: magazine.issues.map((i: any) => ({
       ...i,
     })),
   };

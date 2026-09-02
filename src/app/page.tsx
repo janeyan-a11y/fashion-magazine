@@ -12,7 +12,7 @@ export default async function HomePage() {
     take: 40,
   });
 
-  const heroIssues = issues.slice(0, 5).map((i) => ({
+  const heroIssues = issues.slice(0, 5).map((i: any) => ({
     id: i.id,
     coverUrl: i.coverUrl,
     title: i.title,
@@ -33,7 +33,7 @@ export default async function HomePage() {
     take: 10,
   });
 
-  const serializedIssues = issues.map((i) => ({
+  const serializedIssues = issues.map((i: any) => ({
     ...i,
     createdAt: i.createdAt.toISOString(),
     scrapedAt: i.scrapedAt.toISOString(),

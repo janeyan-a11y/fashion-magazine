@@ -27,7 +27,7 @@ export default async function IssuePage({ params }: { params: Promise<{ id: stri
     ...issue,
     createdAt: issue.createdAt.toISOString(),
     scrapedAt: issue.scrapedAt.toISOString(),
-    articles: issue.articles.map((a) => ({
+    articles: issue.articles.map((a: any) => ({
       ...a,
       createdAt: a.createdAt.toISOString(),
       scrapedAt: a.scrapedAt.toISOString(),

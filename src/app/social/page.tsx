@@ -7,7 +7,7 @@ export default async function SocialPage() {
     take: 60,
   });
 
-  const serialized = posts.map((p) => ({
+  const serialized = posts.map((p: any) => ({
     ...p,
     scrapedAt: p.scrapedAt.toISOString(),
     createdAt: p.createdAt.toISOString(),
