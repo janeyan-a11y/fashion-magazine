@@ -1,0 +1,47 @@
+name: Daily Magazine Scrape
+
+on:
+  schedule:
+    - cron: "0 8 * * *" # 8:00 AM UTC = 4:00 PM Beijing
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Run magazine scrapers
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: npx tsx scripts/scrape-all.ts
+
+      - name: Run XHS scraper
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: npx tsx scripts/scrape-xhs.ts
+
+      - name: Trigger ISR revalidation
+        if: env.VERCEL_DEPLOY_URL != ''
+        run: |
+          curl -X POST "https://${{ env.VERCEL_DEPLOY_URL }}/api/revalidate" \
+            -H "Authorization: Bearer ${{ secrets.REVALIDATE_SECRET }}"
+        env:
+          VERCEL_DEPLOY_URL: ${{ vars.VERCEL_DEPLOY_URL }}

@@ -1,0 +1,109 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Magazine {
+  id          String    @id @default(cuid())
+  name        String
+  nameZh      String?
+  slug        String    @unique
+  websiteUrl  String
+  scrapeUrl   String
+  language    String    @default("zh")
+  country     String    @default("CN")
+  category    String    @default("women")
+  coverSelector   String?
+  articleSelector String?
+  isActive    Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  issues      Issue[]
+  articles    Article[]
+  scrapeLogs  ScrapeLog[]
+}
+
+model Issue {
+  id          String    @id @default(cuid())
+  magazineId  String
+  magazine    Magazine  @relation(fields: [magazineId], references: [id])
+  issueDate   String
+  coverUrl    String
+  coverAlt    String?
+  title       String?
+  description String?
+  sourceUrl   String?
+  isNew       Boolean   @default(false)
+  scrapedAt   DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+
+  articles    Article[]
+
+  @@unique([magazineId, issueDate])
+  @@index([magazineId])
+  @@index([createdAt])
+}
+
+model Article {
+  id          String    @id @default(cuid())
+  issueId     String?
+  issue       Issue?    @relation(fields: [issueId], references: [id])
+  magazineId  String
+  magazine    Magazine  @relation(fields: [magazineId], references: [id])
+  title       String
+  author      String?
+  summary     String?
+  contentHtml String?
+  imageUrls   String    @default("[]")
+  sourceUrl   String?
+  order       Int       @default(0)
+  scrapedAt   DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+
+  @@index([magazineId])
+  @@index([issueId])
+  @@index([createdAt])
+}
+
+model SocialPost {
+  id            String    @id @default(cuid())
+  platform      String    @default("xiaohongshu")
+  externalId    String
+  authorName    String
+  authorAvatar  String?
+  title         String
+  content       String?
+  images        String    @default("[]")
+  tags          String    @default("[]")
+  likeCount     Int       @default(0)
+  collectCount  Int       @default(0)
+  commentCount  Int       @default(0)
+  sourceUrl     String
+  searchKeyword String?
+  scrapedAt     DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+
+  @@unique([platform, externalId])
+  @@index([createdAt])
+  @@index([searchKeyword])
+}
+
+model ScrapeLog {
+  id            String    @id @default(cuid())
+  magazineId    String?
+  magazine      Magazine? @relation(fields: [magazineId], references: [id])
+  targetType    String
+  status        String
+  itemsScraped  Int       @default(0)
+  itemsNew      Int       @default(0)
+  errorMessage  String?
+  startedAt     DateTime  @default(now())
+  finishedAt    DateTime?
+  durationMs    Int?
+}
