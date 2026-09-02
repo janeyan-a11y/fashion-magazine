@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { SocialClient } from "./SocialClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function SocialPage() {
   const posts = await prisma.socialPost.findMany({
     orderBy: { createdAt: "desc" },

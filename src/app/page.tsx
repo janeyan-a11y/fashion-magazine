@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { HomeClient } from "./HomeClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const issues = await prisma.issue.findMany({
     include: {
